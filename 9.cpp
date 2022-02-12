@@ -78,11 +78,11 @@ real approx_sqrt(real a, real eps) {
 
 int main() {
     real a = 0.1, b = 0.2, step = 0.01;
-    const real eps1 = 1e-6 / (3 * 0.09);
+    const real eps1 = 1e-6 / 0.27;
     const real eps2 = 1e-6 / 3;
     const real eps3 = 1e-6 / 3;
-    const int n = 3;
-    const int p = 3;
+    const int n = 4;
+    const int p = 2;
 
     printf("   x |          z*(x) |           z(x) |       diff\n");
     for (real x = a; x <= b + step / 2; x += step) {
