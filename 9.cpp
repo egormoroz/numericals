@@ -80,7 +80,7 @@ int main() {
     real a = 0.1, b = 0.2, step = 0.01;
     const real eps1 = 1e-6 / 0.27;
     const real eps2 = 1e-6 / 3;
-    const real eps3 = 1e-6 / 3;
+    const real eps3 = 1e-6 / 3 / 0.14;
     const int n = 4;
     const int p = 2;
 
