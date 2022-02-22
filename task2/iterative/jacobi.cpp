@@ -35,19 +35,16 @@ int solve(Matrix &a, std::vector<double> &b,
 
     do {
         xp = x;
-        for (int i = 0; i < n; ++i) {
-            double s = 0;
-            for (int j = 0; j < n; ++j)
-                s += (i != j) * a(i, j) * x[j];
-            x[i] = s + b[i];
-        }
+        mul_mat_vec(a, xp, x);
+        for (int i = 0; i < n; ++i)
+            x[i] += b[i];
     } while (dist(x, xp) > eps && ++its < MAX_ITERATIONS);
 
     return its;
 }
 
 int main(int argc, const char *argv[]) {
-    const char *file = "seidel.txt";
+    const char *file = "jacobi.txt";
     if (argc == 2)
         file = argv[1];
 

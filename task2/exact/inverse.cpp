@@ -54,8 +54,12 @@ Matrix next_inverse(Matrix &a, Matrix &prev_inv) {
     return inv;
 }
 
-int main() {
-    std::ifstream fin("inv.txt");
+int main(int argc, const char *argv[]) {
+    const char *file = "inv.txt";
+    if (argc == 2)
+        file = argv[1];
+
+    std::ifstream fin(file);
     Matrix a = mat_from_stream(fin);
     Matrix prev_inv = mat_from_stream(fin);
     int n = a.num_cols();

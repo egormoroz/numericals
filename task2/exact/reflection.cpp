@@ -80,8 +80,12 @@ void reflection(Matrix &a, std::vector<double> &b) {
     printf("]\n");
 }
 
-int main() {
-    std::ifstream fin("2refl.txt");
+int main(int argc, const char *argv[]) {
+    const char *file = "2refl.txt";
+    if (argc == 2)
+        file = argv[1];
+
+    std::ifstream fin(file);
 
     Matrix a = mat_from_stream(fin);
     std::vector<double> b(a.num_cols());

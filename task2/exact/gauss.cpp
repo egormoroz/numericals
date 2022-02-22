@@ -1,5 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
-#include "matrix.hpp"
+#include "../matrix.hpp"
 #include <fstream>
 
 void gauss(Matrix &origm) {
@@ -68,8 +68,12 @@ void gauss(Matrix &origm) {
     }
 }
 
-int main() {
-    std::ifstream fin("2gs.txt");
+int main(int argc, const char *argv[]) {
+    const char *file = "2gs.txt";
+    if (argc == 2)
+        file = argv[1];
+
+    std::ifstream fin(file);
     Matrix m = mat_from_stream(fin);
     print_mat(m);
 

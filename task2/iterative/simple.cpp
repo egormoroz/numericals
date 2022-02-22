@@ -65,13 +65,18 @@ int solve(Matrix &a, std::vector<double> &b, double eps) {
     return its;
 }
 
-int main() {
-    std::ifstream fin("simple.txt");
+int main(int argc, const char *argv[]) {
+    const char *file = "simple.txt";
+    if (argc == 2)
+        file = argv[1];
+
+    std::ifstream fin(file);
     Matrix a = mat_from_stream(fin);
 
     std::vector<double> b(a.num_cols());
     for (auto &i: b)
         fin >> i;
+    print_mat_extended(a, b);
 
     printf("%d iterations: [ ", solve(a, b, 1e-5));
     for (auto &i: b)

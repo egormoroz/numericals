@@ -67,8 +67,12 @@ void sqrt_method(Matrix &u, std::vector<double> &b) {
     printf("]\n");
 }
 
-int main() {
-    std::ifstream fin("2sq.txt");
+int main(int argc, const char *argv[]) {
+    const char *file = "2sq.txt";
+    if (argc == 2)
+        file = argv[1];
+
+    std::ifstream fin(file);
     Matrix a = mat_from_stream(fin);
 
     std::vector<double> b(a.num_cols());
