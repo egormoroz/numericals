@@ -1,6 +1,8 @@
 #include "../matrix.hpp"
 #include <fstream>
 
+const int MAX_ITERATIONS = 1000;
+
 // ||A||_inf
 double norm(const Matrix &a) {
     double s = 0;
@@ -15,15 +17,18 @@ double norm(const Matrix &a) {
 }
 
 //||v||_inf
-double norm(const std::vector<double> &v) {
+double dist(const std::vector<double> &u, 
+        const std::vector<double> &v) 
+{
     double n = 0;
-    for (auto &i: v)
-        if (abs(i) > n)
-            n = abs(i);
+    for (int i = 0; i < (int)u.size(); ++i) {
+        double t = abs(u[i] - v[i]);
+        if (t > n) n = t;
+    }
     return n;
 }
 
-void solve(Matrix &a, std::vector<double> &b, int max_iterations) {
+int solve(Matrix &a, std::vector<double> &b, double eps) {
     int n = a.num_cols();
     Transposed<Matrix> aT(a);
 
@@ -48,12 +53,16 @@ void solve(Matrix &a, std::vector<double> &b, int max_iterations) {
         &c = bb;
     Matrix &B = aa;
 
-    for (int its = 0; its < max_iterations; ++its) {
+    int its = 0;
+    next = bb;
+    do {
+        prev = next;
         mul_mat_vec(B, prev, next);
         for (int i = 0; i < n; ++i)
             next[i] += c[i];
-        prev = next;
-    }
+    } while (dist(next, prev) > eps && ++its < MAX_ITERATIONS);
+
+    return its;
 }
 
 int main() {
@@ -64,11 +73,9 @@ int main() {
     for (auto &i: b)
         fin >> i;
 
-    solve(a, b, 1000);
-
-    printf("[ ");
+    printf("%d iterations: [ ", solve(a, b, 1e-5));
     for (auto &i: b)
-        printf("%5.2f ", i);
+        printf("%.4f ", i);
     printf("]\n");
 }
 
