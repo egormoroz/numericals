@@ -113,6 +113,27 @@ private:
     Mat &m_mat;
 };
 
+template<typename Mat>
+struct SubMatrix {
+    SubMatrix(Mat &m, int off_row, int off_col)
+        : m_mat(m), m_off_row(off_row), m_off_col(off_col) {}
+
+    int num_rows() const { return m_mat.num_rows() - m_off_row; }
+    int num_cols() const { return m_mat.num_cols() - m_off_row; }
+
+    double& operator()(int row, int col) {
+        return m_mat(row + m_off_row, col + m_off_col);
+    }
+
+    const double& operator()(int row, int col) const {
+        return m_mat(row + m_off_row, col + m_off_col);
+    }
+
+private:
+    Mat &m_mat;
+    int m_off_row, m_off_col;
+};
+
 struct Matrix {
     Matrix(int nrows, int ncols) 
         : m_data(nrows * ncols), m_nrows(nrows), m_ncols(ncols) {}
@@ -155,11 +176,10 @@ private:
 };
 
 template<typename A, typename B>
-Matrix dot(const A &a, const B &b) {
+void dot(const A &a, const B &b, Matrix &c) {
     assert(a.num_cols() == b.num_rows());
     int rows = a.num_rows(), cols = b.num_cols();
 
-    Matrix c(rows, cols);
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
             double c_ij = 0;
@@ -168,8 +188,35 @@ Matrix dot(const A &a, const B &b) {
             c(i, j) = c_ij;
         }
     }
+}
 
-    return c;
+template<typename Mat>
+void mul_mat_vec(const Mat &m, const std::vector<double> &v, 
+        std::vector<double> &u) {
+    int n = v.size();
+    u.resize(n);
+    for (int i = 0; i < n; ++i) {
+        double u_i = 0;
+        for (int j = 0; j < n; ++j)
+            u_i += m(i, j) * v[j];
+        u[i] = u_i;
+    }
+}
+
+template<typename Mat>
+void add(Mat &lhs, const Mat &rhs) {
+    int rows = lhs.num_rows(), cols = lhs.num_cols();
+    for (int i = 0; i < rows; ++i)
+        for (int j = 0; j < cols; ++j)
+            lhs(i, j) += rhs(i, j);
+}
+
+template<typename Mat>
+void sub(Mat &lhs, const Mat &rhs) {
+    int rows = lhs.num_rows(), cols = lhs.num_cols();
+    for (int i = 0; i < rows; ++i)
+        for (int j = 0; j < cols; ++j)
+            lhs(i, j) -= rhs(i, j);
 }
 
 inline Matrix mat_from_stream(std::istream &is) {
@@ -190,6 +237,16 @@ void print_mat(const Mat &m) {
         for (int j = 0; j < m.num_cols(); ++j)
             printf("%5.2f ", m(i, j));
         printf("\n");
+    }
+    printf("\n");
+}
+
+template<typename Mat>
+void print_mat_extended(const Mat &m, const std::vector<double> &v) {
+    for (int i = 0; i < m.num_rows(); ++i) {
+        for (int j = 0; j < m.num_cols(); ++j)
+            printf("%5.2f ", m(i, j));
+        printf("%5.2f\n", v[i]);
     }
     printf("\n");
 }

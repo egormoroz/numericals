@@ -69,7 +69,7 @@ void gauss(Matrix &origm) {
 }
 
 int main() {
-    std::ifstream fin("2.txt");
+    std::ifstream fin("2gs.txt");
     Matrix m = mat_from_stream(fin);
     print_mat(m);
 
