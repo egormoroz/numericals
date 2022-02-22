@@ -192,13 +192,28 @@ void dot(const A &a, const B &b, Matrix &c) {
 
 template<typename Mat>
 void mul_mat_vec(const Mat &m, const std::vector<double> &v, 
-        std::vector<double> &u) {
+        std::vector<double> &u) 
+{
     int n = v.size();
     u.resize(n);
     for (int i = 0; i < n; ++i) {
         double u_i = 0;
         for (int j = 0; j < n; ++j)
             u_i += m(i, j) * v[j];
+        u[i] = u_i;
+    }
+}
+
+template<typename Mat>
+void mul_vec_mat(const std::vector<double> &v, 
+        Mat &m, std::vector<double> &u)
+{
+    int n = v.size();
+    u.resize(n);
+    for (int i = 0; i < n; ++i) {
+        double u_i = 0;
+        for (int j = 0; j < n; ++j)
+            u_i += m(j, i) * v[j];
         u[i] = u_i;
     }
 }
