@@ -1,4 +1,4 @@
-#include "matrix.hpp"
+#include "../matrix.hpp"
 #include <fstream>
 
 //вычисляет матрицу v * v^T и умножает каждый полученный элемент на k

@@ -1,4 +1,4 @@
-#include "matrix.hpp"
+#include "../matrix.hpp"
 #include <fstream>
 
 double vdot(const std::vector<double> &u, 

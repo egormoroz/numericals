@@ -1,5 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include "matrix.hpp"
+#include "../matrix.hpp"
 #include <fstream>
 
 //Разложние Холецкого матрицы A через матрицу U
