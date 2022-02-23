@@ -1,0 +1,16 @@
+#ifndef ITERATIVE_HPP
+#define ITERATIVE_HPP
+
+#include <vector>
+
+class Matrix;
+
+using Vec = std::vector<double>;
+
+const int MAX_ITERATIONS = 1000;
+
+int simple(Matrix &a, Vec &b, Vec &x, double eps);
+int seidel(Matrix &a, Vec &b, Vec &x, double eps);
+int jacobi(Matrix &a, Vec &b, Vec &x, double eps);
+
+#endif

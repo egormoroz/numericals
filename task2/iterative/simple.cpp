@@ -1,10 +1,9 @@
 #include "../matrix.hpp"
-#include <fstream>
+#include "iterative.hpp"
 
-const int MAX_ITERATIONS = 1000;
 
 // ||A||_inf
-double norm(const Matrix &a) {
+static double norm(const Matrix &a) {
     double s = 0;
     for (int i = 0; i < a.num_rows(); ++i) {
         double t = 0;
@@ -17,7 +16,7 @@ double norm(const Matrix &a) {
 }
 
 //||v||_inf
-double dist(const std::vector<double> &u, 
+static double dist(const std::vector<double> &u, 
         const std::vector<double> &v) 
 {
     double n = 0;
@@ -28,7 +27,7 @@ double dist(const std::vector<double> &u,
     return n;
 }
 
-int solve(Matrix &a, std::vector<double> &b, double eps) {
+int simple_impl(Matrix &a, std::vector<double> &b, double eps) {
     int n = a.num_cols();
     Transposed<Matrix> aT(a);
 
@@ -65,22 +64,8 @@ int solve(Matrix &a, std::vector<double> &b, double eps) {
     return its;
 }
 
-int main(int argc, const char *argv[]) {
-    const char *file = "simple.txt";
-    if (argc == 2)
-        file = argv[1];
-
-    std::ifstream fin(file);
-    Matrix a = mat_from_stream(fin);
-
-    std::vector<double> b(a.num_cols());
-    for (auto &i: b)
-        fin >> i;
-    print_mat_extended(a, b);
-
-    printf("%d iterations: [ ", solve(a, b, 1e-5));
-    for (auto &i: b)
-        printf("%.4f ", i);
-    printf("]\n");
+int simple(Matrix &a, Vec &b, Vec &x, double eps) {
+    x = b;
+    return simple_impl(a, x, eps);
 }
 

@@ -1,9 +1,8 @@
 #include "../matrix.hpp"
-#include <fstream>
+#include "iterative.hpp"
 
-const int MAX_ITERATIONS = 1000;
 
-double dist(const std::vector<double> &u, 
+static double dist(const std::vector<double> &u, 
         const std::vector<double> &v) 
 {
     double s = 0;
@@ -16,7 +15,7 @@ double dist(const std::vector<double> &u,
     return sqrt(s);
 }
 
-int solve(Matrix &a, std::vector<double> &b, 
+int jacobi(Matrix &a, std::vector<double> &b, 
         std::vector<double> &x, double eps) 
 {
     int n = a.num_cols();
@@ -41,25 +40,5 @@ int solve(Matrix &a, std::vector<double> &b,
     } while (dist(x, xp) > eps && ++its < MAX_ITERATIONS);
 
     return its;
-}
-
-int main(int argc, const char *argv[]) {
-    const char *file = "jacobi.txt";
-    if (argc == 2)
-        file = argv[1];
-
-    std::ifstream fin(file);
-    Matrix a = mat_from_stream(fin);
-    std::vector<double> b(a.num_cols()),
-        x(a.num_cols());
-    for (auto &i: b)
-        fin >> i;
-
-    print_mat_extended(a, b);
-
-    printf("%d iterations: [ ", solve(a, b, x, 1e-5));
-    for (auto &i: x)
-        printf("%.4f ", i);
-    printf("]\n");
 }
 

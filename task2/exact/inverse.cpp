@@ -1,7 +1,8 @@
 #include "../matrix.hpp"
+#include "exact.hpp"
 #include <fstream>
 
-double vdot(const std::vector<double> &u, 
+static double vdot(const std::vector<double> &u, 
         const std::vector<double> &v) 
 {
     double s = 0;
@@ -11,7 +12,7 @@ double vdot(const std::vector<double> &u,
     return s;
 }
 
-Matrix next_inverse(Matrix &a, Matrix &prev_inv) {
+static Matrix next_inverse(Matrix &a, Matrix &prev_inv) {
     int n = a.num_cols();
     Matrix inv(n, n);
 
@@ -54,24 +55,7 @@ Matrix next_inverse(Matrix &a, Matrix &prev_inv) {
     return inv;
 }
 
-int main(int argc, const char *argv[]) {
-    const char *file = "inv.txt";
-    if (argc == 2)
-        file = argv[1];
-
-    std::ifstream fin(file);
-    Matrix a = mat_from_stream(fin);
-    Matrix prev_inv = mat_from_stream(fin);
-    int n = a.num_cols();
-
-    print_mat(a);
-//    print_mat(prev_inv);
-
-    Matrix inv = next_inverse(a, prev_inv);
-    print_mat(inv);
-
-    Matrix id(n, n);
-    dot(a, inv, id);
-    print_mat(id);
+void inverse(Matrix &a, Matrix &prev_inv) {
+    next_inverse(a, prev_inv);
 }
 

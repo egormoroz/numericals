@@ -1,12 +1,11 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include "../matrix.hpp"
-#include <fstream>
+#include "exact.hpp"
 
-void gauss(Matrix &origm) {
+static void gauss_impl(Matrix &origm) {
     RowsRemapped<Matrix> m(origm);
     using Mat = decltype(m);
 
-    const double EPS = 1e-5;
+    const double EPS = 1e-10;
     //прямой ход Гаусса
     for (int i = 0; i < m.num_rows() - 1; ++i) {
         double a_ii = m(i, i);
@@ -68,15 +67,17 @@ void gauss(Matrix &origm) {
     }
 }
 
-int main(int argc, const char *argv[]) {
-    const char *file = "2gs.txt";
-    if (argc == 2)
-        file = argv[1];
+void gauss(Matrix &a, Vec &b, Vec &x) {
+    int n = a.num_cols();
+    Matrix ab(n, n + 1);
+    for (int i = 0; i < n; ++i)
+        for (int j = 0; j < n; ++j)
+            ab(i, j) = a(i, j);
+    for (int i = 0; i < n; ++i)
+        ab(i, n) = b[i];
 
-    std::ifstream fin(file);
-    Matrix m = mat_from_stream(fin);
-    print_mat(m);
-
-    gauss(m);
+    gauss_impl(ab);
+    for (int i = 0; i < n; ++i)
+        x[i] = ab(i, n);
 }
 

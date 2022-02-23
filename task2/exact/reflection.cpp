@@ -1,9 +1,9 @@
 #include "../matrix.hpp"
-#include <fstream>
+#include "exact.hpp"
 
 //вычисляет матрицу v * v^T и умножает каждый полученный элемент на k
 //затем записывает результат в правый нижний угол матрицы mm
-void mul_outer_mult(const std::vector<double> &v, Matrix &mm, double k) {
+static void mul_outer_mult(const std::vector<double> &v, Matrix &mm, double k) {
     int n = v.size(), off = mm.num_cols() - n;
     SubMatrix<Matrix> m(mm, off, off);
 
@@ -13,14 +13,14 @@ void mul_outer_mult(const std::vector<double> &v, Matrix &mm, double k) {
 }
 
 //добавляет к матрице m единичную матрицу
-void add_identity(Matrix &m) {
+static void add_identity(Matrix &m) {
     int n = m.num_cols();
     for (int i = 0; i < n; ++i)
         m(i, i) += 1;
 }
 
-void reflection(Matrix &a, std::vector<double> &b) {
-    const double EPS = 1e-5;
+static void reflection_impl(Matrix &a, std::vector<double> &b) {
+    const double EPS = 1e-10;
 
     int n = a.num_cols();
     Matrix u(n, n), aa(n, n);
@@ -80,20 +80,8 @@ void reflection(Matrix &a, std::vector<double> &b) {
     printf("]\n");
 }
 
-int main(int argc, const char *argv[]) {
-    const char *file = "2refl.txt";
-    if (argc == 2)
-        file = argv[1];
-
-    std::ifstream fin(file);
-
-    Matrix a = mat_from_stream(fin);
-    std::vector<double> b(a.num_cols());
-    for (auto &i: b)
-        fin >> i;
-
-    fin.close();
-
-    reflection(a, b);
+void reflection(Matrix &a, Vec &b, Vec &x) {
+    reflection_impl(a, b);
+    x = b;
 }
 

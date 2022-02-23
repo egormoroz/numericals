@@ -1,10 +1,10 @@
 #include "../matrix.hpp"
-#include <fstream>
+#include "exact.hpp"
 
 //Разложние Холецкого матрицы A через матрицу U
 //А - симметричная положительно определённая матрица
 //U - верхнетреугольная матрица, такая что A = U^T * U
-Matrix split(const Matrix &a) {
+static Matrix split(const Matrix &a) {
     int n = a.num_rows();
     Matrix u(n, n);
 
@@ -31,7 +31,7 @@ Matrix split(const Matrix &a) {
 
 
 //Решить СЛУ методом квадратного корня, U - матрица, полученная разложением split
-void sqrt_method(Matrix &u, std::vector<double> &b) {
+static void sqrt_method_impl(Matrix &u, std::vector<double> &b) {
     //Ax = b, A = U^T * U => U^T * U * x = b
     //Теперь последовательно решаем две простые СЛУ:
     //1. U^T * y = b
@@ -67,21 +67,9 @@ void sqrt_method(Matrix &u, std::vector<double> &b) {
     printf("]\n");
 }
 
-int main(int argc, const char *argv[]) {
-    const char *file = "2sq.txt";
-    if (argc == 2)
-        file = argv[1];
-
-    std::ifstream fin(file);
-    Matrix a = mat_from_stream(fin);
-
-    std::vector<double> b(a.num_cols());
-    for (auto &i: b)
-        fin >> i;
-
-    fin.close();
-
+void sqrt_method(Matrix &a, Vec &b, Vec &x) {
     Matrix u = split(a);
-    print_mat(u);
-    sqrt_method(u, b);
+    sqrt_method_impl(u, b);
+    x = b;
 }
+
