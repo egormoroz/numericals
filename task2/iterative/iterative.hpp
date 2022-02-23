@@ -1,6 +1,8 @@
 #ifndef ITERATIVE_HPP
 #define ITERATIVE_HPP
 
+//#define DEBUG_PRINT
+
 #include <vector>
 
 class Matrix;

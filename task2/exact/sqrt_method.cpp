@@ -48,10 +48,12 @@ static void sqrt_method_impl(Matrix &u, std::vector<double> &b) {
     }
 
     //В b записано решение
+#ifdef DEBUG_PRINT
     printf("[ ");
     for (double &b_i: b)
         printf("%5.2f ", b_i);
     printf("]\n");
+#endif
 
     //Решаем U * x = y, где U - верхнетреугольная матрица
     for (int i = n - 1; i >= 0; --i) {
@@ -61,10 +63,12 @@ static void sqrt_method_impl(Matrix &u, std::vector<double> &b) {
     }
 
     //В b записано решение изначальной СЛУ
+#ifdef DEBUG_PRINT
     printf("[ ");
     for (double &b_i: b)
         printf("%5.2f ", b_i);
     printf("]\n");
+#endif
 }
 
 void sqrt_method(Matrix &a, Vec &b, Vec &x) {

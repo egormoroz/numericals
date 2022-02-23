@@ -1,5 +1,6 @@
 #include "../matrix.hpp"
 #include "iterative.hpp"
+#include <cstdio>
 
 
 static double dist(const std::vector<double> &u, 
@@ -33,11 +34,18 @@ int jacobi(Matrix &a, std::vector<double> &b,
     int its = 0;
 
     do {
+        ++its;
         xp = x;
         mul_mat_vec(a, xp, x);
         for (int i = 0; i < n; ++i)
             x[i] += b[i];
-    } while (dist(x, xp) > eps && ++its < MAX_ITERATIONS);
+#ifdef DEBUG_PRINT
+        printf("[ ");
+        for (auto &i: x)
+            printf("%.4f ", i);
+        printf("]\n");
+#endif
+    } while (dist(x, xp) > eps && its < MAX_ITERATIONS);
 
     return its;
 }

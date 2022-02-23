@@ -61,8 +61,9 @@ static void reflection_impl(Matrix &a, std::vector<double> &b) {
 
         std::swap(a, aa);
         std::swap(b, v);
-
+#ifdef DEBUG_PRINT
         print_mat_extended(a, b);
+#endif
     }
 
 
@@ -74,10 +75,12 @@ static void reflection_impl(Matrix &a, std::vector<double> &b) {
     }
 
     //В b записано решение изначальной СЛУ
+#ifdef DEBUG_PRINT
     printf("[ ");
     for (double &b_i: b)
         printf("%5.2f ", b_i);
     printf("]\n");
+#endif
 }
 
 void reflection(Matrix &a, Vec &b, Vec &x) {

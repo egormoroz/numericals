@@ -1,6 +1,8 @@
 #ifndef EXACT_HPP
 #define EXACT_HPP
 
+//#define DEBUG_PRINT
+
 #include <vector>
 struct Matrix;
 

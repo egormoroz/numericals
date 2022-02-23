@@ -32,6 +32,7 @@ int seidel(Matrix &a, std::vector<double> &b,
     int its = 0;
 
     do {
+        ++its;
         xp = x;
         for (int i = 0; i < n; ++i) {
             double s = 0;
@@ -39,7 +40,14 @@ int seidel(Matrix &a, std::vector<double> &b,
                 s += (i != j) * a(i, j) * x[j];
             x[i] = s + b[i];
         }
-    } while (dist(x, xp) > eps && ++its < MAX_ITERATIONS);
+#ifdef DEBUG_PRINT
+        printf("[ ");
+        for (auto &i: x)
+            printf("%.4f ", i);
+        printf("]\n");
+#endif
+
+    } while (dist(x, xp) > eps && its < MAX_ITERATIONS);
 
     return its;
 }

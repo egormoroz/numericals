@@ -35,7 +35,9 @@ static void gauss_impl(Matrix &origm) {
 
         Row<Mat> a_i(m, i);
         a_i /= a_ii;
+#ifdef DEBUG_PRINT
         print_mat(m);
+#endif
 
         for (int j = i + 1; j < m.num_rows(); ++j) {
             Row<Mat> a_j(m, j);
@@ -43,7 +45,9 @@ static void gauss_impl(Matrix &origm) {
             //но так проще)
             a_j.mul_add(a_i, -m(j, i));
         }
+#ifdef DEBUG_PRINT
         print_mat(m);
+#endif
     }
 
     double a_nn = m(m.num_rows() - 1, m.num_rows() - 1);
@@ -54,7 +58,9 @@ static void gauss_impl(Matrix &origm) {
     Row<Mat> last(m, m.num_rows() - 1);
     last /= a_nn;
 
+#ifdef DEBUG_PRINT
     print_mat(m);
+#endif
 
     //Обратный ход Гаусса
     for (int i = m.num_rows() - 1; i > 0; --i) {
@@ -63,7 +69,9 @@ static void gauss_impl(Matrix &origm) {
             m(j, m.num_cols() - 1) -= b_i * m(j, i);
             m(j, i) = 0;
         }
+#ifdef DEBUG_PRINT
         print_mat(m);
+#endif
     }
 }
 

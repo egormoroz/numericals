@@ -53,13 +53,21 @@ int simple_impl(Matrix &a, std::vector<double> &b, double eps) {
     Matrix &B = aa;
 
     int its = 0;
-    next = bb;
+    next = c;
     do {
+        ++its;
         prev = next;
         mul_mat_vec(B, prev, next);
         for (int i = 0; i < n; ++i)
             next[i] += c[i];
-    } while (dist(next, prev) > eps && ++its < MAX_ITERATIONS);
+#ifdef DEBUG_PRINT
+        printf("[ ");
+        for (auto &i: next)
+            printf("%.4f ", i);
+        printf("]\n");
+#endif
+
+    } while (dist(next, prev) > eps && its < MAX_ITERATIONS);
 
     return its;
 }
