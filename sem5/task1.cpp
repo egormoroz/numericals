@@ -147,7 +147,7 @@ void coord(const QuadraticFn &f) {
 
     Vec3 x;
 
-    for (int iter = 0; iter < 10; ++iter) {
+    for (int iter = 0; iter < 1000; ++iter) {
         printf("%02d (%8.4f, %8.4f, %8.4f) f(x) = %8.4f\n", 
                 iter, x.x, x.y, x.z, f(x));
 
