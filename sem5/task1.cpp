@@ -117,29 +117,59 @@ struct QuadraticFn {
     }
 };
 
-int main() {
-    const double EPS = 1e-6;
+const double EPS = 1e-6;
 
-    QuadraticFn f(0);
+void mngs(const QuadraticFn &f) {
+    Vec3 x;
     double dm = f.a.diag_dom_magnitude();
-    printf("%f\n", dm);
 
-    Vec3 x(-1, -0.2, -2);
+    for (int iter = 0; iter < 1000; ++iter) {
+        printf("%02d (%8.4f, %8.4f, %8.4f) f(x) = %8.4f\n", 
+                iter, x.x, x.y, x.z, f(x));
 
-    printf("00 (%8.4f, %8.4f, %8.4f) f(x) = %8.4f\n", 
-            x.x, x.y, x.z, f(x));
-
-
-    for (int iter = 1; iter < 1000; ++iter) {
         Vec3 q = f.grad(x);
         if (q.norm() / dm < EPS)
             break;
 
         double nu = -q.norm_squared() / (q * (f.a * q));
         x = x + nu * q;
+    }
+}
+
+void coord(const QuadraticFn &f) {
+    double dm = f.a.diag_dom_magnitude();
+
+    const Vec3 orts[3] = {
+        Vec3(1, 0, 0),
+        Vec3(0, 1, 0),
+        Vec3(0, 0, 1)
+    };
+
+    Vec3 x;
+
+    for (int iter = 0; iter < 10; ++iter) {
         printf("%02d (%8.4f, %8.4f, %8.4f) f(x) = %8.4f\n", 
                 iter, x.x, x.y, x.z, f(x));
 
+        if ((f.a * x + f.b).norm() / dm < EPS)
+            break;
+
+        Vec3 q = orts[iter % 3];
+        double nu = -q * (f.a * x + f.b);
+        nu /= q * (f.a * q);
+
+        x = x + nu * q;
     }
+}
+
+int main() {
+    QuadraticFn f(0);
+    double dm = f.a.diag_dom_magnitude();
+    printf("%f\n", dm);
+
+    printf("gradient\n");
+    mngs(f);
+    printf("coord\n");
+    coord(f);
 }
 
