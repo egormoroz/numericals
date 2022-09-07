@@ -49,8 +49,10 @@ struct Mat22 {
  * */
 Vec2 f(Vec2 v) {
     return Vec2 {
-        sin(v.x + 0.5) - v.y - 1,
-        v.x + cos(v.y - 2) - 2
+        sin(v.y + 2.0) - v.x - 1.5,
+        v.y + cos(v.x - 2.0) - 0.5,
+        /* sin(v.x + 0.5) - v.y - 1, */
+        /* v.x + cos(v.y - 2) - 2 */
     };
 }
 
@@ -60,7 +62,9 @@ Vec2 f(Vec2 v) {
  * */
 Mat22 jacobi(Vec2 v) {
     return Mat22 {
-        cos(v.x + 0.5), -1, 1, -sin(v.y - 2)
+        -1, cos(v.y + 2),
+        -sin(v.x - 2), 1
+        /* cos(v.x + 0.5), -1, 1, -sin(v.y - 2) */
     };
 }
 
@@ -86,7 +90,7 @@ Vec2 solve(Vec2 x0, double eps) {
 }
 
 int main() {
-    Vec2 root = solve({3., -1.5}, 1e-5),
+    Vec2 root = solve({-1.7, 1.3}, 1e-5),
          val = f(root);
     printf("F(%f, %f) = [ %.2e, %.2e ]\n",
             root.x, root.y, val.x, val.y);
