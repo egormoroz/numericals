@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.polynomial import Polynomial
 import matplotlib.pyplot as plt
+from math import factorial
 
 def least_square_method(x, y, n):
     Q = np.vander(x, N=n+1)
@@ -24,6 +25,14 @@ def int_simpson(f, a, b, n=16):
     return h/3 * (f_a + 2 * s1 + 4 * s2 + f(b))
 
 
+def legendre_poly(n, m):
+    p = np.array([1])
+    for i in range(0, n):
+        p = np.polymul(p, [-1, 0, 1])
+    p = np.polyder(p, n) / (factorial(n)*2**n)
+    return np.hstack((np.zeros(m - len(p)), p))
+
+
 def legendre_coeffs(f, L):
     n = L.shape[0]
     c = np.zeros(n, dtype=np.float64)
@@ -38,12 +47,7 @@ def legendre_coeffs(f, L):
 
 
 f = lambda x: x*(x+2)**0.5
-
-L = np.array(
-    [[   0,   0,   0,    1],
-     [   0,   0,  -1,    0],
-     [   0, 1.5,   0, -0.5],
-     [-2.5,   0, 1.5,    0]])
+L = np.vstack([legendre_poly(i, 4) for i in range(4)])
 
 x = np.linspace(-1, 1, 5)
 y = f(x)
