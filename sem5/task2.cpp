@@ -95,7 +95,7 @@ int main() {
     /* constexpr double a = -1, b = 1; */
     /* auto f = [](double x) { return 3 * x - cos(x) - 1; }; */
 
-    auto g = [f](double x) { return abs(x) * f(x); };
+    auto g = [f](double x) { return fabs(x) * f(x); };
 
     printf("---------f(x)-------\n");
     run(a, b, f);
