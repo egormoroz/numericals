@@ -1,11 +1,22 @@
 #define _USE_MATH_DEFINES
+#define _CRT_SECURE_NO_WARNINGS
 #include <cmath>
 #include <cstdio>
+#include <algorithm>
 
-double ipoly_lagrange(double x, 
+FILE* fpt_dump;
+
+void dump_array(const double* a, int n) {
+    for (int i = 0; i < n; ++i)
+        fprintf(fpt_dump, "%f ", a[i]);
+    fprintf(fpt_dump, "\n");
+}
+
+double ipoly_lagrange(
         const double* xs,
         const double* ys,
-        int n)
+        int n,
+        double x)
 {
     double s = 0;
 
@@ -21,6 +32,35 @@ double ipoly_lagrange(double x,
     }
 
     return s;
+}
+
+double ipoly_newton(
+        const double* xs,
+        const double* ys,
+        int n,
+        double x)
+{
+    double y = 0;
+
+    for (int i = 0; i < n; ++i) {
+        double omega = 1;
+        for (int j = 0; j < i; ++j)
+            omega *= x - xs[j];
+
+        double dd = 0;
+        for (int j = 0; j <= i; ++j) {
+            double denum = 1;
+            for (int k = 0; k <= i; ++k) {
+                if (j == k) continue;
+                denum *= xs[j] - xs[k];
+            }
+            dd += ys[j] / denum;
+        }
+
+        y += dd * omega;
+    }
+
+    return y;
 }
 
 void linspace(double a, double b, double* xs, int n) {
@@ -47,44 +87,46 @@ void alterspace(double a, double b, double* xs, int n) {
             + (b + a));
 }
 
-double norm(const double* u, const double* v, int n) {
-    double s = 0;
-    for (int i = 0; i < n; ++i) {
-        double t = u[i] - v[i];
-        s += t * t;
-    }
-
-    return sqrt(s);
+double max_diff(const double* u, const double* v, int n) {
+    double max_d = fabs(u[0] - v[0]);
+    for (int i = 1; i < n; ++i)
+        max_d = std::max(max_d, fabs(u[i] - v[i]));
+    return max_d;
 }
 
-template<typename F>
-void run(double a, double b, F&& f) {
-    constexpr int N = 100;
+template<typename F, typename InterPoly>
+void run(double a, double b, F&& f, InterPoly&& ipoly) {
+    constexpr int N = 50;
     constexpr int M = 1000;
 
-    double xs[N], ys[N], 
-           ts[M], us[M], vs[M];
+    double x_table[N], y_table[N], 
+           x_test[M], y_test[M], ip_test[M];
 
-    linspace(a, b, ts, M);
+    linspace(a, b, x_test, M);
     for (int i = 0; i < M; ++i)
-        us[i] = f(ts[i]);
+        y_test[i] = f(x_test[i]);
+
+    dump_array(x_test, M);
+    dump_array(y_test, M);
 
     for (int n = 1; n < N; ++n) {
-        linspace(a, b, xs, n);
+        linspace(a, b, x_table, n);
         for (int i = 0; i < n; ++i)
-            ys[i] = f(xs[i]);
+            y_table[i] = f(x_table[i]);
 
         for (int i = 0; i < M; ++i)
-            vs[i] = ipoly_lagrange(ts[i], xs, ys, n);
-        printf("%02d %.4e ", n, norm(us, vs, M));
+            ip_test[i] = ipoly(x_table, y_table, n, x_test[i]);
+        printf("%02d %d %.4e ", n, M, max_diff(ip_test, y_test, M));
+        dump_array(ip_test, M);
 
-        alterspace(a, b, xs, n);
+        alterspace(a, b, x_table, n);
         for (int i = 0; i < n; ++i)
-            ys[i] = f(xs[i]);
+            y_table[i] = f(x_table[i]);
 
         for (int i = 0; i < M; ++i)
-            vs[i] = ipoly_lagrange(ts[i], xs, ys, n);
-        printf("%.4e\n", norm(us, vs, M));
+            ip_test[i] = ipoly(x_table, y_table, n, x_test[i]);
+        printf("%.4e\n", max_diff(ip_test, y_test, M));
+        dump_array(ip_test, M);
     }
 
 }
@@ -95,11 +137,14 @@ int main() {
     /* constexpr double a = -1, b = 1; */
     /* auto f = [](double x) { return 3 * x - cos(x) - 1; }; */
 
-    auto g = [f](double x) { return fabs(x) * f(x); };
+    fpt_dump = fopen("lagr.txt", "w");
+    printf("---------lagrange-------\n");
+    run(a, b, f, ipoly_lagrange);
+    fclose(fpt_dump);
 
-    printf("---------f(x)-------\n");
-    run(a, b, f);
-    printf("------|x|f(x)-------\n");
-    run(a, b, g);
+    fpt_dump = fopen("newt.txt", "w");
+    printf("----------newton--------\n");
+    run(a, b, f, ipoly_newton);
+    fclose(fpt_dump);
 }
 
