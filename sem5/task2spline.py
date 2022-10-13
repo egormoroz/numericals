@@ -10,7 +10,7 @@ def alterspace(a, b, n=100):
     return np.flip(x)
 
 def spline10(xs, ys, x):
-    i = np.maximum(np.searchsorted(xs, x), 1)
+    i = np.clip(np.searchsorted(xs, x) - 1, 0, len(xs) - 2)
     y = (x - xs[i]) / (xs[i-1] - xs[i]) * ys[i-1]
     y += (x - xs[i-1]) / (xs[i] - xs[i-1]) * ys[i]
     return y
@@ -69,14 +69,42 @@ def spline(xs, p, x):
     i = np.clip(np.searchsorted(xs, x) - 1, 0, len(xs) - 2)
     return np.polyval(p[:, i], x)
 
-# xs = np.linspace(0, 2*pi, 10)
-xs = alterspace(0, 2*pi, 10)
-ys = np.sin(xs)
-x = np.linspace(0, 2*pi, 100)
+def f(x):
+    return x + np.log10(x/5)
 
-p = build_spline32(xs, ys, np.cos(xs[0]), np.cos(xs[-1]))
-y = spline(xs, p, x)
+def derf(x):
+    return 1 + 1/(np.log(10) * x)
 
-plt.plot(x, np.sin(x), x, y, '--', xs, ys, 'r*')
-plt.show()
+def run(a, b, max_n, k, spl):
+    x_test = np.linspace(a, b, k)
+    y_test = f(x_test)
+    for n in range(2, max_n+1):
+        xs = np.linspace(a, b, n)
+        iy_test = spl(xs, f(xs), x_test)
+        dev = np.max(np.abs(y_test - iy_test))
+
+        xs = alterspace(a, b, n)
+        iy_test = spl(xs, f(xs), x_test)
+        dev_opt = np.max(np.abs(y_test - iy_test))
+
+        print('{:02d} {} {:.4e} {:.4e}'.format(
+                n, k, dev, dev_opt))
+
+
+a, b = 1, 2
+max_n, k = 50, 1000
+
+def spl21(xs, ys, x):
+    return spline(xs, build_spline21(xs, ys), x)
+
+def spl32(xs, ys, x):
+    p = build_spline32(xs, ys, derf(a), derf(b))
+    return spline(xs, p, x)
+
+print('S10')
+run(a, b, max_n, k, spline10)
+print('S21')
+run(a, b, max_n, k, spl21)
+print('S32')
+run(a, b, max_n, k, spl32)
 
