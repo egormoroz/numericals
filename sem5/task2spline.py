@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from math import pi
 
 def alterspace(a, b, n=100):
@@ -101,10 +100,14 @@ def spl32(xs, ys, x):
     p = build_spline32(xs, ys, derf(a), derf(b))
     return spline(xs, p, x)
 
-print('S10')
-run(a, b, max_n, k, spline10)
-print('S21')
-run(a, b, max_n, k, spl21)
-print('S32')
-run(a, b, max_n, k, spl32)
+def main():
+    print('S10')
+    run(a, b, max_n, k, spline10)
+    print('S21')
+    run(a, b, max_n, k, spl21)
+    print('S32')
+    run(a, b, max_n, k, spl32)
 
+
+if __name__ == '__main__':
+    main()
