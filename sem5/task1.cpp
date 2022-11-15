@@ -187,7 +187,7 @@ const double EPS = 1e-6;
 //МНГС
 Vec3 mngs(const QuadraticFn& f) {
     //начальная точка (проинициализирована нулём)
-    Vec3 x;
+    Vec3 x(1, 1, 1);
     double dm = f.a.diag_dom_magnitude();
 
     //не более 1000 итераций, чтобы не возникло бск. цикла
@@ -221,7 +221,7 @@ Vec3 coord(const QuadraticFn& f) {
     };
 
     //начальная точка (проинициализирована нулём)
-    Vec3 x;
+    Vec3 x(1, 1, 1);
 
     //не более 1000 итераций, чтобы не возникло бск. цикла
     for (int iter = 0; iter < 1000; ++iter) {

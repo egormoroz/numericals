@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 a, b = 1, 2
 n, M = 10, 1000
 f = lambda x: x + np.log10(x/5)
+a, b = 1, 2
+a, b = -pi, pi
+f = lambda x: x + np.log10(x/5)
+f = lambda x: 3*x - np.cos(x) - 1
 
 x_test = np.linspace(a, b, M)
 y_test = f(x_test)

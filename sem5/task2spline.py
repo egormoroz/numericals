@@ -9,7 +9,7 @@ def alterspace(a, b, n=100):
     return np.flip(x)
 
 def spline10(xs, ys, x):
-    i = np.clip(np.searchsorted(xs, x) - 1, 0, len(xs) - 2)
+    i = np.clip(np.searchsorted(xs, x), 1, len(xs) - 1)
     y = (x - xs[i]) / (xs[i-1] - xs[i]) * ys[i-1]
     y += (x - xs[i-1]) / (xs[i] - xs[i-1]) * ys[i]
     return y
