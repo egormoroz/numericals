@@ -1,84 +1,97 @@
 import numpy as np
-from numpy.polynomial import Polynomial
 import matplotlib.pyplot as plt
-from math import factorial
 
-def least_square_method(x, y, n):
+
+def lsm_normal(x, y, n):
     Q = np.vander(x, N=n+1)
     return np.linalg.solve(Q.T @ Q, Q.T @ y)
 
-    
-def int_simpson(f, a, b, n=16):
-    assert n % 2 == 0
 
-    h = (b - a) / n
-    f_a = f(a)
-    s1 = np.zeros_like(f_a, dtype=np.float64)
-    s2 = np.zeros_like(f_a, dtype=np.float64)
+def next_orth_poly(x, qcur, qprev):
+    qcur_x = np.polyval(qcur, x)
+    alpha = x @ qcur_x**2 / (qcur_x@qcur_x)
 
-    for i in range(1, n//2):
-        s1 += f(a + 2 * i * h)
+    qprev_x = np.polyval(qprev, x)
+    beta = np.sum(x * qcur_x * qprev_x) / (qprev_x@qprev_x)
 
-    for i in range(1, n//2 + 1):
-        s2 += f(a + (2 * i - 1) * h)
+    qnext = np.hstack((qcur, 0))
+    qnext = np.polyadd(qnext, -alpha*qcur)
+    qnext = np.polyadd(qnext, -beta*qprev)
 
-    return h/3 * (f_a + 2 * s1 + 4 * s2 + f(b))
+    return qnext
 
 
-def legendre_poly(n, m):
-    p = np.array([1])
-    for i in range(0, n):
-        p = np.polymul(p, [-1, 0, 1])
-    p = np.polyder(p, n) / (factorial(n)*2**n)
-    return np.hstack((np.zeros(m - len(p)), p))
+def poly_gen(x):
+    qprev = np.array([1])
+    qcur = np.array([1, -np.sum(x) / len(x)])
+
+    yield qprev
+    yield qcur
+
+    while True:
+        qcur, qprev = next_orth_poly(x, qcur, qprev), qcur
+        yield qcur
 
 
-def legendre_coeffs(f, L):
-    n = L.shape[0]
-    c = np.zeros(n, dtype=np.float64)
-    for i in range(n):
-        alpha = lambda x: f(x) * np.polyval(L[i], x)
-        beta = lambda x: np.polyval(L[i], x)**2
-        num = int_simpson(alpha, -1, 1)
-        denum = int_simpson(beta, -1, 1)
-        c[i] = num/denum
+def lsm_orth(x, y, n):
+    n += 1
+    E = np.zeros((len(x), n))
+    q = [p for _, p in zip(range(n), poly_gen(x))]
+    for i, p in enumerate(q):
+        E[:, i] = np.polyval(p, x)
 
-    return c
+    y = E.T @ y
+    poly = np.zeros(n)
+    for i, p in enumerate(q):
+        a_i = y[i] / (E[:, i] @ E[:, i])
+        poly = np.polyadd(poly, a_i * p)
+
+    return poly
 
 
-f = lambda x: x*(x+2)**0.5
-L = np.vstack([legendre_poly(i, 4) for i in range(4)])
+def f(x):
+    return x * np.sin(x)
 
-x = np.linspace(-1, 1, 5)
-y = f(x)
-a = least_square_method(x, y, 3)
 
-b = np.zeros(4, dtype=np.float64)
-for ci, p in zip(legendre_coeffs(f, L), L):
-    b += ci * p
+def gen_table(n, a, b, k=3, err_scale=1e-2):
+    x_ideal = np.linspace(a, b, n)
+    y_ideal = f(x_ideal)
+    x = np.repeat(x_ideal, k)
+    y = np.repeat(y_ideal, k) + np.random.random(len(x)) * err_scale
+    return x_ideal, y_ideal, x, y
 
-#почему у np.polyval и Polynomial разный порядок коэффов?????????????
-lsm_p = str(Polynomial(np.flip(np.round(a, 4))))
-lg_p = str(Polynomial(np.flip(np.round(b, 4))))
 
-print(lsm_p.replace('**', '^'))
-print(lg_p.replace('**', '^'))
+def square_error(p, x, y_ideal):
+    error = np.polyval(p, x) - y_ideal
+    return error @ error
 
-fig, axs = plt.subplots(2)
 
-x = np.linspace(-1, 1, 100)
-y = f(x)
-u = np.polyval(a, x)
-v = np.polyval(b, x)
+m, max_n = 50, 25
+a, b = 0, 1
+x_ideal, y_ideal, x, y = gen_table(m, a, b)
 
-axs[0].plot(x, y, 'r', label='f(x)')
-axs[0].plot(x, u, 'g', label='lsm')
-axs[0].plot(x, v, 'b', label='legendre')
-axs[0].legend(loc='upper right')
+x_lp = np.linspace(a, b)
 
-axs[1].plot(x, np.zeros_like(x), '--')
-axs[1].plot(x, y-u, 'g', label='f(x) - lsm(x)')
-axs[1].plot(x, y-v, 'b', label='f(x) - legendre(x)')
-axs[1].legend(loc='upper right')
-plt.show()
+for n in range(1, 5+1):
+    a_normal = lsm_normal(x, y, n)
+    a_orth = lsm_orth(x, y, n)
 
+    plt.plot(x_lp, np.polyval(a_normal, x_lp),
+             x_lp, np.polyval(a_orth, x_lp),
+             x_ideal, y_ideal, '.')
+    plt.title(f'deg={n}')
+    plt.show()
+
+print('{:>4} {:>10} {:>10} {:>12} {:>8}'.format(
+    'n', 'normal', 'orthog', 'diff', 'improv%'))
+for n in range(1, max_n+1):
+    a_normal = lsm_normal(x, y, n)
+    a_orth = lsm_orth(x, y, n)
+
+    normal_error = square_error(a_normal, x_ideal, y_ideal)
+    orth_error = square_error(a_orth, x_ideal, y_ideal)
+    diff = normal_error - orth_error
+    improv = np.round(100 * diff / normal_error, decimals=2)
+
+    print('{: 4d} {:10.4e} {:10.4e} {:12.4e} {:8.2f}'.format(
+        n, normal_error, orth_error, diff, improv))
