@@ -57,7 +57,7 @@ def gen_table(n, a, b, k=3, err_scale=1e-2):
     x_ideal = np.linspace(a, b, n)
     y_ideal = f(x_ideal)
     x = np.repeat(x_ideal, k)
-    y = np.repeat(y_ideal, k) + np.random.random(len(x)) * err_scale
+    y = np.repeat(y_ideal, k) + (1 - 2 * np.random.random(len(x))) * err_scale
     return x_ideal, y_ideal, x, y
 
 
@@ -68,7 +68,7 @@ def square_error(p, x, y_ideal):
 
 m, max_n = 50, 25
 a, b = 0, 1
-x_ideal, y_ideal, x, y = gen_table(m, a, b)
+x_ideal, y_ideal, x, y = gen_table(m, a, b, err_scale=0.1)
 
 x_lp = np.linspace(a, b)
 
@@ -78,7 +78,8 @@ for n in range(1, 5+1):
 
     plt.plot(x_lp, np.polyval(a_normal, x_lp),
              x_lp, np.polyval(a_orth, x_lp),
-             x_ideal, y_ideal, '.')
+             x, y, '.')
+             # x_ideal, y_ideal, '.')
     plt.title(f'deg={n}')
     plt.show()
 
