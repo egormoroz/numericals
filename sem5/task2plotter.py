@@ -2,12 +2,10 @@ from task2poly import *
 from task2spline import *
 import matplotlib.pyplot as plt
 
-a, b = 1, 2
-n, M = 10, 1000
-f = lambda x: x + np.log10(x/5)
-a, b = 1, 2
+# 1. Построить графики интерполяционных полиномов
+
 a, b = -pi, pi
-f = lambda x: x + np.log10(x/5)
+n, M = 10, 1000
 f = lambda x: 3*x - np.cos(x) - 1
 
 x_test = np.linspace(a, b, M)
@@ -36,6 +34,7 @@ axs[1].legend(loc='lower right')
 
 plt.show()
 
+# 2. Построить графики интерполирования сплайном S32
 
 y_splp = spl32(x_lp, f(x_lp), x_test)
 y_spopt = spl32(x_opt, f(x_opt), x_test)
