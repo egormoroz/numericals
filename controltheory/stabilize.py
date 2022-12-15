@@ -59,7 +59,7 @@ def stabilize_fc(P, S, ideal_eigvals):
 def stabilize_nfc(P, T, k, ideal_eigvals):
     n = P.shape[0]
     P = np.linalg.inv(T) @ P @ T
-    if np.real(np.linalg.eigvals(P[k:, k:])) >= 0:
+    if np.any(np.real(np.linalg.eigvals(P[k:, k:])) >= 0):
         print('system is not stabilizable')
         return None
 
@@ -117,9 +117,10 @@ print()
 print('--- nfc case ---')
 
 C = stabilize(P, Q, ideal_eigvals)
-print('--- C ---')
-print(C)
-print('--- eig_vals(P + QC) ---')
-print(np.linalg.eigvals(P + Q @ C))
-print(matrix_polyval(np.poly(ideal_eigvals), P + Q @ C))
+if C is not None:
+    print('--- C ---')
+    print(C)
+    print('--- eig_vals(P + QC) ---')
+    print(np.linalg.eigvals(P + Q @ C))
+    print(matrix_polyval(np.poly(ideal_eigvals), P + Q @ C))
 
